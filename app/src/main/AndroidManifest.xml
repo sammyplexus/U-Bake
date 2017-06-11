@@ -20,13 +20,16 @@
         </activity>
         <activity
             android:name=".RecipesListActivity"
-            android:label="@string/title_recipes_list"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:label="@string/title_recipes_list">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.freelance.samuelagbede.ubake.MainActivity" />
+        </activity>
         <activity
             android:name=".RecipesDetailActivity"
             android:label="@string/title_recipes_detail"
             android:parentActivityName=".RecipesListActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.freelance.samuelagbede.ubake.RecipesListActivity" />
