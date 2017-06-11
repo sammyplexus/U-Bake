@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">UBake</string>
+    <string name="title_activity_recipe_details">RecipeDetails</string>
+    <string name="title_recipes_list">Recipes</string>
+    <string name="title_recipes_detail">Recipes Detail</string>
+</resources>
