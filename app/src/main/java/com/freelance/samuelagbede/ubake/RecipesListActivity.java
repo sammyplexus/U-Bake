@@ -53,7 +53,6 @@ public class RecipesListActivity extends AppCompatActivity {
             steps = intent.getParcelableArrayListExtra(MainActivity.RECIPE_STEPS_MODEL);
             ingredients = intent.getParcelableArrayListExtra(MainActivity.RECIPE_INGREDIENTS_MODEL);
 
-            Log.d("Ingredients", recipes.getIngredients().size()+"");
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -98,7 +97,7 @@ public class RecipesListActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-//            holder.recipe_clicked_items.setText(recipes.getSteps().get(position).getDescription());
+            holder.recipe_clicked_items.setText(steps.get(position).getDescription());
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -126,7 +125,7 @@ public class RecipesListActivity extends AppCompatActivity {
                 return 0;
             }
             else {
-                return steps.size() + 1;
+                return steps.size();
             }
 
 
