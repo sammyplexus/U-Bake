@@ -241,8 +241,14 @@ public class RecipesDetailActivity extends AppCompatActivity {
         if (Util.SDK_INT <= 23){
             releasePlayer();
         }
+
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        releasePlayer();
+    }
 
     @Override
     protected void onStop() {

@@ -105,7 +105,7 @@ public class RecipesListActivity extends AppCompatActivity implements SelectReci
     @Override
     public void onRecyclerItemClick(int position) {
         //It is -1 because of the extra view at the top I am taking into consideration
-        if (position > 1){
+        if (position > 0){
             Recipes.Steps step = steps.get(position-1);
             if (mTwoPane) {
                 Bundle arguments = new Bundle();

@@ -11,12 +11,12 @@
     <com.google.android.exoplayer2.ui.SimpleExoPlayerView
         android:id="@+id/exoplayer_view"
         android:layout_width="match_parent"
-        android:layout_height="240dp"/>
+        android:layout_height="@dimen/exoplayer_height"/>
 
     <TextView
         android:id="@+id/tv_recipe_step_title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="4dp"/>
+        android:padding="@dimen/small_padding"/>
 
 </LinearLayout>

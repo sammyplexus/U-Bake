@@ -72,12 +72,12 @@ public class WidgetService extends RemoteViewsService {
 
             @Override
             public RemoteViews getLoadingView() {
-                return null;
+               return new RemoteViews(getPackageName(), R.layout.gridview_individual_items);
             }
 
             @Override
             public int getViewTypeCount() {
-                return 0;
+                return 1;
             }
 
             @Override

@@ -32,6 +32,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ArrayList<Recipes>>, SelectRecipesRecyclerAdapter.recyclerListener{
+    private static final String RECIPES_ARRAYLIST = "recipes_arraylist";
     CustomIdlingResource mIdlingResource;
 
     @VisibleForTesting
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @BindView(R.id.btn_retry)
     Button mRetryButton;
     SelectRecipesRecyclerAdapter recyclerAdapter;
+    ArrayList<Recipes> mRecipesArraylist;
     GridLayoutManager layoutManager;
     static final int LOADER_ID = 2321;
 
@@ -72,8 +74,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mRecyclerView.addItemDecoration(dividerItemDecoration);
         mRecyclerView.setAdapter(recyclerAdapter);
 
-        if (savedInstanceState != null)
-        makeConnection();
+        if (savedInstanceState == null){
+            makeConnection();
+        }
+        else {
+            mRecipesArraylist = savedInstanceState.getParcelableArrayList(RECIPES_ARRAYLIST);
+            if (mRecipesArraylist != null)
+                recyclerAdapter.swapData(mRecipesArraylist);
+        }
+
 
         getIdlingResource();
     }
@@ -150,6 +159,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        if (mRecipesArraylist != null)
+        outState.putParcelableArrayList(RECIPES_ARRAYLIST, mRecipesArraylist);
     }
 
     @Override

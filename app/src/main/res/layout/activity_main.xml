@@ -10,26 +10,26 @@
         android:id="@+id/recyclerview_select_recipes"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="@dimen/medium_padding"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginRight="8dp"
+        android:layout_marginRight="@dimen/medium_padding"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="@dimen/medium_padding" />
 
     <ProgressBar
         android:id="@+id/pb_main_activity_indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="invisible"
-        android:layout_marginRight="8dp"
+        android:layout_marginRight="@dimen/medium_padding"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="@dimen/medium_padding"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="@dimen/medium_padding"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="@dimen/medium_padding" />
 
     <include layout="@layout/button_retry"
         />
