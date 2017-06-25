@@ -1,9 +1,22 @@
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/recipes_detail"
-    style="?android:attr/textAppearanceLarge"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    android:textIsSelectable="true"
-    tools:context="com.freelance.samuelagbede.ubake.RecipesDetailFragment" />
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    tools:context="com.freelance.samuelagbede.ubake.RecipesDetailActivity"
+    tools:ignore="MergeRootFrame">
+
+    <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+        android:id="@+id/exoplayer_view"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"/>
+
+    <TextView
+        android:id="@+id/tv_recipe_step_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp"/>
+
+</LinearLayout>

@@ -27,25 +27,4 @@ public class NetworkUtils {
         return responseString;
     }
 
-    public static String getResponseFromHttpUrl() throws IOException
-    {
-        URL url = new URL(urlSring);
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        try {
-            InputStream in = urlConnection.getInputStream();
-
-            Scanner scanner = new Scanner(in);
-            scanner.useDelimiter("\\A");
-
-            boolean hasInput = scanner.hasNext();
-            if (hasInput) {
-                return scanner.next();
-            } else {
-                return null;
-            }
-        } finally {
-            urlConnection.disconnect();
-        }
-    }
-
 }

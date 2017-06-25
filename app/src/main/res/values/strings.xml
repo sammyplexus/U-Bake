@@ -3,4 +3,8 @@
     <string name="title_activity_recipe_details">RecipeDetails</string>
     <string name="title_recipes_list">Recipes</string>
     <string name="title_recipes_detail">Recipes Detail</string>
+    <string name="previous_step"><![CDATA[<< Previous Step]]></string>
+    <string name="next_step"><![CDATA[Next step >>]]></string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 </resources>

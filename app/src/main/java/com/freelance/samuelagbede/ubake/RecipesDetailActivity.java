@@ -1,15 +1,46 @@
 package com.freelance.samuelagbede.ubake;
 
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.freelance.samuelagbede.ubake.Models.Recipes;
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
+
+import java.util.ArrayList;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+import static android.R.attr.fragment;
+import static android.R.attr.stepSize;
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 /**
  * An activity representing a single Recipes detail screen. This
@@ -19,19 +50,58 @@ import android.view.MenuItem;
  */
 public class RecipesDetailActivity extends AppCompatActivity {
 
+
+    private static final String STEP_NUMBER_TO_SHOW = "STEP_NUMBER_TO_SHOW";
+    private static final String STEPS_ARRAYLIST = "STEPS_ARRAYLIST";
+    @BindView(R.id.exoplayer_view)
+    SimpleExoPlayerView simpleExoPlayerView;
+    @BindView(R.id.tv_recipe_step_title)
+    TextView mStepTitle;
+    @BindView(R.id.btn_increment_steps_instructions)
+    Button mStepsInstructionsNext;
+    @BindView(R.id.btn_decrement_steps_instructions)
+    Button mStepsInstructionsPrev;
+    Recipes.Steps step;
+    ArrayList<Recipes.Steps> stepsArrayList;
+    int present_step_position;
+    String videoUrl;
+    private SimpleExoPlayer exoPlayer;
+    private int currentWindow;
+    private long playbackPosition;
+    private boolean playWhenReady;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recipes_detail);
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
-        //setSupportActionBar(toolbar);
+
 
         // Show the Up button in the action bar.
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        if (getIntent().hasExtra(RecipesListActivity.INDIVIDUAL_STEPS_CLICKED))
+        {
+            step = getIntent().getParcelableExtra(RecipesListActivity.INDIVIDUAL_STEPS_CLICKED);
+            stepsArrayList = getIntent().getParcelableArrayListExtra(RecipesListActivity.TOTAL_STEPS_ARRAYLIST);
+            present_step_position = getIntent().getIntExtra(RecipesListActivity.RECIPE_POSITION, 0);
+
+
+
+            //Todo : Get title of the food item and display it in the actionbar
         }
 
+        if (getIntent().hasExtra(STEP_NUMBER_TO_SHOW)){
+            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+            present_step_position = getIntent().getIntExtra(STEP_NUMBER_TO_SHOW, 0);
+            stepsArrayList = getIntent().getParcelableArrayListExtra(STEPS_ARRAYLIST);
+            step = stepsArrayList.get(present_step_position);
+
+        }
+        setContentView(R.layout.activity_recipes_detail);
+        ButterKnife.bind(this);
+        videoUrl = step.getVideoURL();
+        mStepTitle.setText(step.getDescription());
+
+        
         // savedInstanceState is non-null when there is fragment state
         // saved from previous configurations of this activity
         // (e.g. when rotating the screen from portrait to landscape).
@@ -39,21 +109,81 @@ public class RecipesDetailActivity extends AppCompatActivity {
         // to its container so we don't need to manually add it.
         // For more information, see the Fragments API guide at:
         //
-        // http://developer.android.com/guide/components/fragments.html
+        //http://developer.android.com/guide/components/fragments.html
         //
-        if (savedInstanceState == null) {
+
+        if (savedInstanceState == null)
+        {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putString(RecipesDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(RecipesDetailFragment.ARG_ITEM_ID));
+            /*Bundle arguments = new Bundle();
+            arguments.putParcelable(RecipesListActivity.INDIVIDUAL_STEPS_CLICKED,
+                    getIntent().getParcelableExtra(RecipesListActivity.INDIVIDUAL_STEPS_CLICKED));
             RecipesDetailFragment fragment = new RecipesDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.recipes_detail_container, fragment)
-                    .commit();
+                    .commit();*/
         }
     }
+
+
+    @OnClick(R.id.btn_increment_steps_instructions)
+    void onClickIncrement(){
+        if (present_step_position == stepsArrayList.size()-1){
+            //Gotten to the end
+            return;
+        }
+        present_step_position++;
+        Intent intent = new Intent(RecipesDetailActivity.this, RecipesDetailActivity.class);
+        intent.putExtra(STEP_NUMBER_TO_SHOW, present_step_position);
+        intent.putExtra(STEPS_ARRAYLIST, stepsArrayList);
+        overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+        startActivity(intent);
+
+        Recipes.Steps stap = stepsArrayList.get(present_step_position);
+    }
+
+    @OnClick(R.id.btn_decrement_steps_instructions)
+    void onClickDecrement(){
+        if (present_step_position == 0){
+            //At the beginning
+            return;
+        }
+        present_step_position--;
+        Intent intent = new Intent(RecipesDetailActivity.this, RecipesDetailActivity.class);
+        intent.putExtra(STEP_NUMBER_TO_SHOW, present_step_position);
+        intent.putExtra(STEPS_ARRAYLIST, stepsArrayList);
+
+        Recipes.Steps stap = stepsArrayList.get(present_step_position);
+        Log.d("STep", stap.getDescription());
+        startActivity(intent);
+    }
+
+
+
+    private void initializePlayer(String url) {
+        Log.d("String", url);
+        exoPlayer = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(this), new DefaultTrackSelector(), new DefaultLoadControl());
+        simpleExoPlayerView.setPlayer(exoPlayer);
+        playWhenReady = true;
+        //Remember to handle playWhenReady for saveInstanceState
+        simpleExoPlayerView.setMinimumWidth(WRAP_CONTENT);
+        exoPlayer.setPlayWhenReady(playWhenReady);
+        exoPlayer.seekTo(currentWindow, playbackPosition);
+
+        Uri uri = Uri.parse(url);
+        MediaSource mediaSource = buildMediaSource(uri);
+        exoPlayer.prepare(mediaSource, true, false);
+    }
+
+    private MediaSource buildMediaSource(Uri uri) {
+        Log.d("ZZ", uri.toString());
+        return new ExtractorMediaSource(uri,
+                new DefaultHttpDataSourceFactory("factory_4"),
+                new DefaultExtractorsFactory(), null, null);
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -70,5 +200,65 @@ public class RecipesDetailActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (Util.SDK_INT > 23){
+            if (videoUrl.length() > 0){
+                initializePlayer(videoUrl);
+            }
+            else {
+                //No video available
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initializePlayer(videoUrl);
+        /*if ((Util.SDK_INT <= 23 || exoPlayer == null)){
+            if (Util.SDK_INT > 23)
+            {
+                if (videoUrl.length() > 0)
+                {
+                    initializePlayer(videoUrl);
+                }
+                else
+                    {
+                    //No video available
+                }
+            }
+        }*/
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (Util.SDK_INT <= 23){
+            releasePlayer();
+        }
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (Util.SDK_INT > 23){
+            releasePlayer();
+        }
+    }
+
+    private void releasePlayer() {
+        if (exoPlayer != null){
+            playbackPosition = exoPlayer.getCurrentPosition();
+            currentWindow = exoPlayer.getCurrentWindowIndex();
+
+            exoPlayer.release();
+            exoPlayer = null;
+        }
     }
 }

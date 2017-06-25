@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.freelance.samuelagbede.ubake.Models.Recipes;
@@ -45,7 +46,7 @@ public class SelectRecipesRecyclerAdapter extends RecyclerView.Adapter<SelectRec
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-      holder.title.setText(recipesArrayList.get(position).getName());
+        holder.title.setText(recipesArrayList.get(position).getName());
     }
 
     @Override

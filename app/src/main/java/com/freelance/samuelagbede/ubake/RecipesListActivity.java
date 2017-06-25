@@ -2,11 +2,12 @@ package com.freelance.samuelagbede.ubake;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import android.util.Config;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 
+import com.freelance.samuelagbede.ubake.Adapters.SelectRecipesRecyclerAdapter;
 import com.freelance.samuelagbede.ubake.Models.Recipes;
 
 import java.util.ArrayList;
@@ -31,8 +33,12 @@ import butterknife.ButterKnife;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class RecipesListActivity extends AppCompatActivity {
+//I use the same interface for listening for all the recyclerviews
+public class RecipesListActivity extends AppCompatActivity implements SelectRecipesRecyclerAdapter.recyclerListener {
 
+    public static final String INDIVIDUAL_STEPS_CLICKED = "individual_steps_clicked";
+    public static final String TOTAL_STEPS_ARRAYLIST = "total_steps_arraylist";
+    public static final String RECIPE_POSITION = "recipe_position";
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
@@ -48,6 +54,8 @@ public class RecipesListActivity extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipes_list);
+
+        if (getSupportActionBar() != null)
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         if (getIntent().hasExtra(MainActivity.RECIPE_DETAIL_MODEL))
@@ -56,8 +64,9 @@ public class RecipesListActivity extends AppCompatActivity {
             recipes = intent.getParcelableExtra(MainActivity.RECIPE_DETAIL_MODEL);
             steps = intent.getParcelableArrayListExtra(MainActivity.RECIPE_STEPS_MODEL);
             ingredients = intent.getParcelableArrayListExtra(MainActivity.RECIPE_INGREDIENTS_MODEL);
-
         }
+
+        getSupportActionBar().setTitle(recipes.getName());
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recipes_list);
         setupRecyclerView(recyclerView);
@@ -81,20 +90,55 @@ public class RecipesListActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(recipes, steps, ingredients));
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(recipes, steps, ingredients, this));
     }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        //Check for support for landscape here.
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
+
+        }
+    }
+
+    @Override
+    public void onRecyclerItemClick(int position) {
+        //It is -1 because of the extra view at the top I am taking into consideration
+        Recipes.Steps step = steps.get(position-1);
+        if (mTwoPane) {
+            Bundle arguments = new Bundle();
+            arguments.putParcelable(INDIVIDUAL_STEPS_CLICKED, step);
+            RecipesDetailFragment fragment = new RecipesDetailFragment();
+            fragment.setArguments(arguments);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.recipes_detail_container, fragment)
+                    .commit();
+        } else {
+            Intent intent = new Intent(this, RecipesDetailActivity.class);
+            intent.putExtra(TOTAL_STEPS_ARRAYLIST, steps);
+            intent.putExtra(INDIVIDUAL_STEPS_CLICKED, step);
+            intent.putExtra(RECIPE_POSITION, position-1);
+            startActivity(intent);
+        }
+    }
+
+
 
     public class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
+
+        SelectRecipesRecyclerAdapter.recyclerListener listener;
 
         private final Recipes recipes;
         private ArrayList<Recipes.Steps> steps;
         private ArrayList<Recipes.Ingredients> ingredients;
 
-        public SimpleItemRecyclerViewAdapter(Recipes recipes, ArrayList<Recipes.Steps> steps, ArrayList<Recipes.Ingredients> ingredients) {
+        public SimpleItemRecyclerViewAdapter(Recipes recipes, ArrayList<Recipes.Steps> steps, ArrayList<Recipes.Ingredients> ingredients, SelectRecipesRecyclerAdapter.recyclerListener listener) {
             this.recipes = recipes;
             this.steps = steps;
             this.ingredients = ingredients;
+            this.listener = listener;
         }
 
         @Override
@@ -106,26 +150,18 @@ public class RecipesListActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.recipe_clicked_items.setText(steps.get(position).getDescription());
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 0; i < ingredients.size(); i++){
+                stringBuilder.append(ingredients.get(i).getQuantity() + " ").append(ingredients.get(i).getMeasure()+ " ").append(ingredients.get(i).getIngredient()+"\n");
+            }
 
-            holder.mView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mTwoPane) {
-                        Bundle arguments = new Bundle();
-                        //arguments.putString(RecipesDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-                        RecipesDetailFragment fragment = new RecipesDetailFragment();
-                        fragment.setArguments(arguments);
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.recipes_detail_container, fragment)
-                                .commit();
-                    } else {
-                        Context context = v.getContext();
-                        Intent intent = new Intent(context, RecipesDetailActivity.class);
-                        context.startActivity(intent);
-                    }
-                }
-            });
+            if (position == 0){
+                holder.recipe_clicked_items.setText(stringBuilder.toString());
+            }
+            else {
+                holder.recipe_clicked_items.setText(steps.get(position-1).getDescription());
+            }
+
         }
 
         @Override
@@ -134,24 +170,27 @@ public class RecipesListActivity extends AppCompatActivity {
                 return 0;
             }
             else {
-                return steps.size();
+                //the one is for the extra view on the top that shows just the ingredients
+                return steps.size()+ 1;
             }
 
 
         }
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
             @BindView(R.id.tv_recipe_clicked_items)
             public TextView recipe_clicked_items;
-            public View mView;
 
             public ViewHolder(View view) {
                 super(view);
-                mView = view;
                 ButterKnife.bind(this, view);
-
+                view.setOnClickListener(this);
             }
 
+            @Override
+            public void onClick(View v) {
+                listener.onRecyclerItemClick(getAdapterPosition());
+            }
         }
     }
 }
