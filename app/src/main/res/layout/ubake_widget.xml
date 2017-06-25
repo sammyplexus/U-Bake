@@ -4,7 +4,7 @@
     android:background="#09C"
     android:padding="@dimen/widget_margin">
 
-    <GridView
+    <GridLayout
         android:id="@+id/widget_grid_view"
         android:layout_height="match_parent"
         android:layout_width="match_parent"/>

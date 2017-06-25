@@ -105,22 +105,25 @@ public class RecipesListActivity extends AppCompatActivity implements SelectReci
     @Override
     public void onRecyclerItemClick(int position) {
         //It is -1 because of the extra view at the top I am taking into consideration
-        Recipes.Steps step = steps.get(position-1);
-        if (mTwoPane) {
-            Bundle arguments = new Bundle();
-            arguments.putParcelable(INDIVIDUAL_STEPS_CLICKED, step);
-            RecipesDetailFragment fragment = new RecipesDetailFragment();
-            fragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.recipes_detail_container, fragment)
-                    .commit();
-        } else {
-            Intent intent = new Intent(this, RecipesDetailActivity.class);
-            intent.putExtra(TOTAL_STEPS_ARRAYLIST, steps);
-            intent.putExtra(INDIVIDUAL_STEPS_CLICKED, step);
-            intent.putExtra(RECIPE_POSITION, position-1);
-            startActivity(intent);
+        if (position > 1){
+            Recipes.Steps step = steps.get(position-1);
+            if (mTwoPane) {
+                Bundle arguments = new Bundle();
+                arguments.putParcelable(INDIVIDUAL_STEPS_CLICKED, step);
+                RecipesDetailFragment fragment = new RecipesDetailFragment();
+                fragment.setArguments(arguments);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.recipes_detail_container, fragment)
+                        .commit();
+            } else {
+                Intent intent = new Intent(this, RecipesDetailActivity.class);
+                intent.putExtra(TOTAL_STEPS_ARRAYLIST, steps);
+                intent.putExtra(INDIVIDUAL_STEPS_CLICKED, step);
+                intent.putExtra(RECIPE_POSITION, position-1);
+                startActivity(intent);
+            }
         }
+
     }
 
 
@@ -159,6 +162,8 @@ public class RecipesListActivity extends AppCompatActivity implements SelectReci
                 holder.recipe_clicked_items.setText(stringBuilder.toString());
             }
             else {
+                holder.itemView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+
                 holder.recipe_clicked_items.setText(steps.get(position-1).getDescription());
             }
 

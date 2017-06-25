@@ -59,7 +59,8 @@ public class RecipeUtils {
 
                 ingredientsArrayList.add(ingredients);
             }
-         recipes.setIngredients(ingredientsArrayList);
+
+            recipes.setIngredients(ingredientsArrayList);
 
             JSONArray recipe_steps =  complete_individual_recipe.getJSONArray(RECIPE_STEPS);
 
