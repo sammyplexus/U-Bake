@@ -1,6 +1,7 @@
 package com.freelance.samuelagbede.ubake;
 
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.Snackbar;
@@ -13,19 +14,30 @@ import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.JsonReader;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.Toast;
+
 import com.freelance.samuelagbede.ubake.Adapters.SelectRecipesRecyclerAdapter;
 import com.freelance.samuelagbede.ubake.IdlingResource.CustomIdlingResource;
 import com.freelance.samuelagbede.ubake.Models.Recipes;
 import com.freelance.samuelagbede.ubake.Utilities.NetworkUtils;
 import com.freelance.samuelagbede.ubake.Utilities.RecipeUtils;
 import com.google.android.exoplayer2.C;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONException;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,11 +71,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     static final int LOADER_ID = 2321;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        makeConnection();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+
         layoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.span_count));
 
         recyclerAdapter = new SelectRecipesRecyclerAdapter(this, this);
@@ -74,21 +92,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mRecyclerView.addItemDecoration(dividerItemDecoration);
         mRecyclerView.setAdapter(recyclerAdapter);
 
-        if (savedInstanceState == null){
+        /*if (savedInstanceState == null){
+            Log.d("savedInstance", "not null");
             makeConnection();
         }
         else {
             mRecipesArraylist = savedInstanceState.getParcelableArrayList(RECIPES_ARRAYLIST);
             if (mRecipesArraylist != null)
                 recyclerAdapter.swapData(mRecipesArraylist);
-        }
-
+        }*/
 
         getIdlingResource();
     }
     public void makeConnection(){
             getSupportLoaderManager().initLoader(LOADER_ID, null, this);
-
     }
 
     @OnClick (R.id.btn_retry)
@@ -105,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             ArrayList<Recipes> mRecipesArraylistCache;
             @Override
             protected void onStartLoading() {
+                mIdlingResource.setIdleState(false);
 
                 if (mRecipesArraylistCache == null){
                     forceLoad();
@@ -124,7 +142,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
-                    Snackbar.make(getCurrentFocus(),  "Error in connection, please try again", Snackbar.LENGTH_LONG).show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this, "Error in connection, please try again", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
 
                     MainActivity.this.runOnUiThread(new Runnable() {
                         @Override
@@ -149,6 +173,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoadFinished(Loader<ArrayList<Recipes>> loader, ArrayList<Recipes> data) {
         progressBar.setVisibility(View.INVISIBLE);
         recyclerAdapter.swapData(data);
+        mIdlingResource.setIdleState(true);
     }
 
     @Override

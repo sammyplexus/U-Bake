@@ -14,9 +14,11 @@ import android.support.v7.app.ActionBar;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.freelance.samuelagbede.ubake.Models.Recipes;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -57,6 +59,8 @@ public class RecipesDetailActivity extends AppCompatActivity {
     SimpleExoPlayerView simpleExoPlayerView;
     @BindView(R.id.tv_recipe_step_title)
     TextView mStepTitle;
+    @BindView(R.id.iv_recipe_step_picture)
+    ImageView mStepImage;
     @BindView(R.id.btn_increment_steps_instructions)
     Button mStepsInstructionsNext;
     @BindView(R.id.btn_decrement_steps_instructions)
@@ -65,6 +69,7 @@ public class RecipesDetailActivity extends AppCompatActivity {
     ArrayList<Recipes.Steps> stepsArrayList;
     int present_step_position;
     String videoUrl;
+    String thumbnailUrl;
     private SimpleExoPlayer exoPlayer;
     private int currentWindow;
     private long playbackPosition;
@@ -100,6 +105,11 @@ public class RecipesDetailActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         videoUrl = step.getVideoURL();
         mStepTitle.setText(step.getDescription());
+        thumbnailUrl = step.getThumbnailURL();
+
+        if (thumbnailUrl.length() > 2){
+            Glide.with(this).load(thumbnailUrl).into(mStepImage);
+        }
 
         
         // savedInstanceState is non-null when there is fragment state

@@ -20,10 +20,8 @@ public class NetworkUtils {
     public static String MakeNetworkCall() throws IOException {
         OkHttpClient client = new OkHttpClient();
         final Request request = new Request.Builder().url(NetworkUtils.urlSring).build();
-
         Response response = client.newCall(request).execute();
         String responseString = response.body().string();
-
         return responseString;
     }
 

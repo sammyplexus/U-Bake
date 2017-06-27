@@ -13,9 +13,11 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 
+import com.bumptech.glide.Glide;
 import com.freelance.samuelagbede.ubake.Adapters.SelectRecipesRecyclerAdapter;
 import com.freelance.samuelagbede.ubake.Models.Recipes;
 
@@ -165,6 +167,11 @@ public class RecipesListActivity extends AppCompatActivity implements SelectReci
                 holder.itemView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
 
                 holder.recipe_clicked_items.setText(steps.get(position-1).getDescription());
+                String thumbnailUrl = steps.get(position-1).getThumbnailURL();
+                if (thumbnailUrl.length() > 2){
+                    Glide.with(RecipesListActivity.this).load(thumbnailUrl).into(holder.recipe_clicked_images);
+                }
+
             }
 
         }
@@ -185,6 +192,9 @@ public class RecipesListActivity extends AppCompatActivity implements SelectReci
         public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
             @BindView(R.id.tv_recipe_clicked_items)
             public TextView recipe_clicked_items;
+
+            @BindView(R.id.tv_recipe_clicked_imageView)
+            public ImageView recipe_clicked_images;
 
             public ViewHolder(View view) {
                 super(view);

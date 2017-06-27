@@ -24,22 +24,22 @@ public class UBakeWidget extends AppWidgetProvider
 
     }
 
-    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
+    static RemoteViews updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.ubake_widget);
-        Intent intent = new Intent(context, RecipesDetailActivity.class);
-        intent.addCategory(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        intent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT|Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent intent = new Intent(context, WidgetService.class);
+        views.setRemoteAdapter(R.id.widget_grid_view, intent);
+
+        Intent appIntent = new Intent(context, WidgetService.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setPendingIntentTemplate(R.id.widget_grid_view, pendingIntent);
 
-        Intent serviceIntent = new Intent(context, WidgetService.class);
-        views.setRemoteAdapter(R.id.widget_grid_view, intent);
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
+
+        return views;
     }
 
     @Override
