@@ -95,14 +95,8 @@ public class RecipesListActivity extends AppCompatActivity implements SelectReci
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(recipes, steps, ingredients, this));
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        //Check for support for landscape here.
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
 
-        }
-    }
+
 
     @Override
     public void onRecyclerItemClick(int position) {

@@ -4,6 +4,7 @@ import android.support.test.espresso.Espresso;
 import android.support.test.espresso.IdlingResource;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.action.ViewActions;
+import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -20,6 +21,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static android.R.attr.id;
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -51,7 +53,11 @@ public class UITest {
 
     @Test
     public void checkIfRecyclerViewShows(){
-        onData(anything()).inAdapterView(withId(R.id.recyclerview_select_recipes)).atPosition(0).perform(click());
+        onView(withId(R.id.recyclerview_select_recipes)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
+        onView(withId(R.id.recipes_list)).perform(RecyclerViewActions.actionOnItemAtPosition(1, click()));
+        onView(withId(R.id.tv_recipe_step_title)).check(matches(withText("Recipe Introduction")));
+
+
     }
 
     @After
