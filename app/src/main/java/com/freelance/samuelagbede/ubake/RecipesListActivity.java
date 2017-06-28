@@ -1,14 +1,10 @@
 package com.freelance.samuelagbede.ubake;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
-import android.util.Config;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -158,12 +154,15 @@ public class RecipesListActivity extends AppCompatActivity implements SelectReci
                 holder.recipe_clicked_items.setText(stringBuilder.toString());
             }
             else {
-                holder.itemView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
 
+                holder.itemView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
                 holder.recipe_clicked_items.setText(steps.get(position-1).getDescription());
                 String thumbnailUrl = steps.get(position-1).getThumbnailURL();
                 if (thumbnailUrl.length() > 2){
                     Glide.with(RecipesListActivity.this).load(thumbnailUrl).into(holder.recipe_clicked_images);
+                }
+                else {
+                    holder.recipe_clicked_images.setVisibility(View.GONE);
                 }
 
             }

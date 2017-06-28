@@ -36,17 +36,62 @@ public class CustomWidgetFactory implements RemoteViewsService.RemoteViewsFactor
     }
     @Override
     public void onCreate() {
+        final long identityToken = Binder.clearCallingIdentity();
+        try {
+            AssetManager assetManager = context.getAssets();
+            InputStream inputStream;
+            String string = "";
+            try
+            {
+                inputStream = assetManager.open("bake.json");
+                if(inputStream != null)
+                {
+                    BufferedReader br = null;
+                    StringBuilder sb = new StringBuilder();
+
+                    String line;
+                    try {
+
+                        br = new BufferedReader(new InputStreamReader(inputStream));
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line);
+                        }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        if (br != null) {
+                            try {
+                                br.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    string =  sb.toString();
+                }
+                recipes = RecipeUtils.parseHTTPResponse(string);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        Binder.restoreCallingIdentity(identityToken);
 
     }
 
     @Override
     public void onDataSetChanged() {
-        final long identityToken = Binder.clearCallingIdentity();
+        /*final long identityToken = Binder.clearCallingIdentity();
         try {
             AssetManager assetManager = context.getAssets();
             InputStream inputStream;
 
-            ArrayList<Recipes> recipes;
             String string = "";
             try
             {
@@ -89,7 +134,7 @@ public class CustomWidgetFactory implements RemoteViewsService.RemoteViewsFactor
         catch (Exception e){
             e.printStackTrace();
         }
-        Binder.restoreCallingIdentity(identityToken);
+        Binder.restoreCallingIdentity(identityToken);*/
     }
 
     @Override
@@ -105,12 +150,20 @@ public class CustomWidgetFactory implements RemoteViewsService.RemoteViewsFactor
 
     @Override
     public RemoteViews getViewAt(int position) {
-        if (recipes == null || position > recipes.size()) {
+        if (recipes == null) {
             return null;
         }
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.gridview_individual_items);
-        remoteViews.setTextViewText (R.id.widget_grid_view_recipe_name, recipes.get(position).getName());
-        remoteViews.setTextViewText(R.id.widget_grid_view_recipe_description, recipes.get(position).getIngredients().toString());
+        remoteViews.setTextViewText (R.id.widget_grid_view_recipe_name, recipes.get(position).getName() +  " ingredients");
+
+        ArrayList<Recipes.Ingredients> ingredients = recipes.get(position).getIngredients();
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < ingredients.size(); i++){
+            stringBuilder.append(ingredients.get(i).getQuantity() + " ").append(ingredients.get(i).getMeasure()+ " ").append(ingredients.get(i).getIngredient()+"\n");
+            remoteViews.setTextViewText(R.id.widget_grid_view_recipe_description, stringBuilder.toString());
+        }
+
         remoteViews.setOnClickFillInIntent(R.id.widget_grid_view_recipe_description, new Intent());
         return remoteViews;
     }

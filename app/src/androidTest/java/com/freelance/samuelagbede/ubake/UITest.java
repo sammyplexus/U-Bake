@@ -52,11 +52,10 @@ public class UITest {
 
 
     @Test
-    public void checkIfRecyclerViewShows(){
+    public void checkIfRecyclerViewShowsWhenInternetAvailable(){
         onView(withId(R.id.recyclerview_select_recipes)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
         onView(withId(R.id.recipes_list)).perform(RecyclerViewActions.actionOnItemAtPosition(1, click()));
         onView(withId(R.id.tv_recipe_step_title)).check(matches(withText("Recipe Introduction")));
-
 
     }
 
