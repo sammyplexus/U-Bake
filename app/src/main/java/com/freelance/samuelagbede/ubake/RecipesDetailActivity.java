@@ -211,7 +211,6 @@ public class RecipesDetailActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-                initializePlayer(videoUrl);
 
 
     }
@@ -251,6 +250,7 @@ public class RecipesDetailActivity extends AppCompatActivity {
         if (exoPlayer != null){
             playbackPosition = exoPlayer.getCurrentPosition();
             currentWindow = exoPlayer.getCurrentWindowIndex();
+            exoPlayer.setPlayWhenReady(false);
             exoPlayer.stop();
             exoPlayer.release();
             exoPlayer = null;
