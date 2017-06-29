@@ -151,7 +151,6 @@ public class RecipesDetailActivity extends AppCompatActivity {
         overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
         startActivity(intent);
 
-        Recipes.Steps stap = stepsArrayList.get(present_step_position);
     }
 
     @OnClick(R.id.btn_decrement_steps_instructions)
@@ -166,14 +165,12 @@ public class RecipesDetailActivity extends AppCompatActivity {
         intent.putExtra(STEPS_ARRAYLIST, stepsArrayList);
 
         Recipes.Steps stap = stepsArrayList.get(present_step_position);
-        Log.d("STep", stap.getDescription());
         startActivity(intent);
     }
 
 
 
     private void initializePlayer(String url) {
-        Log.d("String", url);
         exoPlayer = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(this), new DefaultTrackSelector(), new DefaultLoadControl());
         simpleExoPlayerView.setPlayer(exoPlayer);
         playWhenReady = true;
@@ -188,7 +185,6 @@ public class RecipesDetailActivity extends AppCompatActivity {
     }
 
     private MediaSource buildMediaSource(Uri uri) {
-        Log.d("ZZ", uri.toString());
         return new ExtractorMediaSource(uri,
                 new DefaultHttpDataSourceFactory("factory_4"),
                 new DefaultExtractorsFactory(), null, null);
@@ -215,42 +211,24 @@ public class RecipesDetailActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (Util.SDK_INT > 23){
-            if (videoUrl.length() > 0){
                 initializePlayer(videoUrl);
-            }
-            else {
-                //No video available
-            }
-        }
+
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         initializePlayer(videoUrl);
-        /*if ((Util.SDK_INT <= 23 || exoPlayer == null)){
-            if (Util.SDK_INT > 23)
-            {
-                if (videoUrl.length() > 0)
-                {
-                    initializePlayer(videoUrl);
-                }
-                else
-                    {
-                    //No video available
-                }
-            }
-        }*/
+
 
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (Util.SDK_INT <= 23){
+
             releasePlayer();
-        }
 
     }
 
@@ -263,16 +241,17 @@ public class RecipesDetailActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (Util.SDK_INT > 23){
             releasePlayer();
-        }
+
     }
+
+
 
     private void releasePlayer() {
         if (exoPlayer != null){
             playbackPosition = exoPlayer.getCurrentPosition();
             currentWindow = exoPlayer.getCurrentWindowIndex();
-
+            exoPlayer.stop();
             exoPlayer.release();
             exoPlayer = null;
         }
